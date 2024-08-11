@@ -296,5 +296,4 @@ public class FcmService {
     private void validateFcmReserveMessage(@NotNull FcmReserveRequest fcmReserveRequest) throws IllegalArgumentException, NullPointerException{
         fcmServiceValidator.validate(fcmReserveRequest);
     }
-
 }
