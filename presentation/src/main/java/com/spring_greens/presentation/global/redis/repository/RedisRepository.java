@@ -1,4 +1,4 @@
-package com.spring_greens.presentation.product.repository;
+package com.spring_greens.presentation.global.redis.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spring_greens.presentation.product.dto.redis.DeserializedRedisProduct;

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spring_greens.presentation.global.redis.converter.ifs.RedisConverter;
+import com.spring_greens.presentation.global.factory.converter.ifs.ConverterFactory;
 import com.spring_greens.presentation.global.redis.exception.RedisException;
-import com.spring_greens.presentation.global.redis.converter.RedisConverterImpl;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductInformation;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisShopInformation;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class RedisShopInformationJsonDeserializer extends JsonDeserializer<DeserializedRedisShopInformation> {
     private final ObjectMapper objectMapper;
-    private final RedisConverter redisConverter;
+    private final ConverterFactory converterFactory;
 
     @Override
     public DeserializedRedisShopInformation deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
@@ -40,7 +39,7 @@ public class RedisShopInformationJsonDeserializer extends JsonDeserializer<Deser
                     })
                     .toList();
 
-            return redisConverter.convertDeserializedRedisShopInformation(jsonNode, productInfoList);
+            return converterFactory.getRedisConverter().convertDeserializedRedisShopInformation(jsonNode, productInfoList);
         } catch (IOException e) {
             log.error("Error deserializing shopInformation JSON: {}", e.getMessage(), e);
             throw new RedisException.RedisIOException(e.getMessage());

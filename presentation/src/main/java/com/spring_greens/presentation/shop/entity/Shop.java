@@ -12,6 +12,8 @@ public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "member_id")
+    private Long memberId;
     private String contact;
     private String name;
     private String intro;

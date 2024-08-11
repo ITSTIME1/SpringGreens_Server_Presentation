@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring_greens.presentation.product.dto.redis.DeserializedRedisProduct;
 import com.spring_greens.presentation.product.dto.redis.RedisProduct;
-import com.spring_greens.presentation.product.repository.RedisRepository;
+import com.spring_greens.presentation.global.redis.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,5 +1,6 @@
 package com.spring_greens.presentation.global.factory.converter;
 
+import com.spring_greens.presentation.fcm.converter.ifs.FcmConverter;
 import com.spring_greens.presentation.global.factory.converter.ifs.ConverterFactory;
 import com.spring_greens.presentation.global.redis.converter.ifs.RedisConverter;
 import com.spring_greens.presentation.map.converter.ifs.MallConverter;
@@ -28,6 +29,8 @@ public class ConverterFactoryImpl implements ConverterFactory {
     private final RedisConverter redisConverter;
     @Qualifier(value = "mallConverterImpl")
     private final MallConverter mallConverter;
+    private final FcmConverter fcmConverter;
+
     @Override
     public MallConverter getMallConverter() {
         return mallConverter;
@@ -36,5 +39,10 @@ public class ConverterFactoryImpl implements ConverterFactory {
     @Override
     public RedisConverter getRedisConverter() {
         return redisConverter;
+    }
+
+    @Override
+    public FcmConverter getFcmConverter() {
+        return fcmConverter;
     }
 }

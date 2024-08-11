@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
 	implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
+	implementation("com.google.firebase:firebase-admin:9.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive") // redis
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.3.0") // jpa
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")

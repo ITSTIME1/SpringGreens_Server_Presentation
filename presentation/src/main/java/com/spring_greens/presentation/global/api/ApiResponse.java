@@ -26,10 +26,22 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public static <T> ApiResponse<T> ok() {
+        return new ApiResponse<>(ApiMessage.SUCCESS.getStatus().value(),
+                ApiMessage.SUCCESS.getResponseMessage(),
+                null);
+    }
+
     public static <T> ApiResponse<T> ok(@Nullable final T data) {
         return new ApiResponse<>(ApiMessage.SUCCESS.getStatus().value(),
                 ApiMessage.SUCCESS.getResponseMessage(),
                 data);
+    }
+
+    public static <T> ApiResponse<T> fail(){
+        return new ApiResponse<>(ApiMessage.FAIL.getStatus().value(),
+                ApiMessage.FAIL.getResponseMessage(),
+                null);
     }
 
     public static <T> ApiResponse<T> fail(@Nullable final T data) {

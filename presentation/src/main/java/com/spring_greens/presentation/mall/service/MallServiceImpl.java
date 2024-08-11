@@ -9,6 +9,7 @@ import com.spring_greens.presentation.mall.dto.response.MallStreetResponse;
 import com.spring_greens.presentation.mall.exception.MallException;
 import com.spring_greens.presentation.mall.repository.MallRepository;
 import com.spring_greens.presentation.mall.service.ifs.MallService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class MallServiceImpl implements MallService {
 
     @Override
     @Transactional(readOnly = true)
-    public MallDestinationResponse getMallDestinationInformation(MallRequest mallRequest) {
+    public MallDestinationResponse getMallDestinationInformation(@NotNull MallRequest mallRequest) {
 
         // 1. Get specific mall information that contained width, latitude, longitude
         Destination destination = mallRepository.findMallDestination(mallRequest.getName())

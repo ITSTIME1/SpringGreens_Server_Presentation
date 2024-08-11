@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spring_greens.presentation.global.exception.CommonException;
 import com.spring_greens.presentation.global.factory.converter.ifs.ConverterFactory;
 import com.spring_greens.presentation.global.redis.exception.RedisException;
+import com.spring_greens.presentation.global.redis.repository.RedisRepository;
 import com.spring_greens.presentation.global.redis.validation.ifs.RedisValidator;
 import com.spring_greens.presentation.product.dto.redis.DeserializedRedisProduct;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductInformation;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisShopInformation;
 import com.spring_greens.presentation.product.dto.redis.request.RedisProductRequest;
 import com.spring_greens.presentation.product.dto.redis.response.ifs.RedisProductResponse;
-import com.spring_greens.presentation.product.repository.RedisRepository;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 public class RedisService {
     private final RedisRepository redisRepository;
     private final ConverterFactory converterFactory;
-//    private final RedisConverter redisConverter;
     private final RedisValidator redisValidator;
 
     /**
@@ -33,14 +33,15 @@ public class RedisService {
      */
     private static final String IMAGE_DIR = "/images/";
 
-    public RedisProductResponse getProductsFromRedisUsingKey(RedisProductRequest redisProductRequest)  {
+    public RedisProductResponse getProductsFromRedisUsingKey(@NotNull RedisProductRequest redisProductRequest)  {
         try {
-            DeserializedRedisProduct deserializedRedisProduct = null;
+            DeserializedRedisProduct deserializedRedisProduct;
             // 1. 파라미터 검증
-            if(validateRedisProductRequest(redisProductRequest)) {
-                // 2. 상품 URL 가공
-                deserializedRedisProduct = modifyImageUrl(getProduct(redisProductRequest.getMallName()));
-            }
+            validateRedisProductRequest(redisProductRequest);
+
+            // 2. 상품 URL 가공
+            deserializedRedisProduct = modifyImageUrl(getProduct(redisProductRequest.getMallName()));
+
             // 3. 상품 반환
             return convertToResponse(redisProductRequest.getDomain(), deserializedRedisProduct);
 
@@ -64,8 +65,8 @@ public class RedisService {
         return redisRepository.getProductsByMallName(mallName);
     }
 
-    public boolean validateRedisProductRequest(RedisProductRequest redisProductRequest) throws IllegalArgumentException{
-        return redisValidator.validate(redisProductRequest);
+    public void validateRedisProductRequest(@NotNull RedisProductRequest redisProductRequest) throws IllegalArgumentException{
+        redisValidator.validate(redisProductRequest);
     }
 
     private DeserializedRedisProduct modifyImageUrl(DeserializedRedisProduct deserializedRedisProduct) {

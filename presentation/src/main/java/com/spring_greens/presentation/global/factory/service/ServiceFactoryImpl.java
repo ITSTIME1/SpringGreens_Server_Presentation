@@ -1,8 +1,10 @@
 package com.spring_greens.presentation.global.factory.service;
 
+import com.spring_greens.presentation.fcm.service.FcmService;
 import com.spring_greens.presentation.global.factory.service.ifs.ServiceFactory;
 import com.spring_greens.presentation.global.redis.service.RedisService;
 import com.spring_greens.presentation.mall.service.ifs.MallService;
+import com.spring_greens.presentation.shop.service.ShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Component;
 public class ServiceFactoryImpl implements ServiceFactory {
     private final RedisService redisService;
     private final MallService mallService;
+    private final FcmService fcmService;
+    private final ShopService shopService;
     @Override
     public RedisService getRedisService() {
         return redisService;
@@ -32,5 +36,15 @@ public class ServiceFactoryImpl implements ServiceFactory {
     @Override
     public MallService getMallService() {
         return mallService;
+    }
+
+    @Override
+    public FcmService getFcmService() {
+        return fcmService;
+    }
+
+    @Override
+    public ShopService getShopService() {
+        return shopService;
     }
 }

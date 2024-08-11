@@ -24,14 +24,14 @@ public class MapController extends AbstractBaseController {
     }
 
     @GetMapping("/get/mall/street")
-    @Operation(summary = "상가거리이동 정보 제공", description = "상가거리 이동시, 기준 좌표와 마커 표시를 위한 좌표값 제공")
+    @Operation(summary = "상가거리이동 정보 제공", description = "상가거리 이동시, 기준 좌표와 마커 표시를 위한 좌표값 제공 API")
     public ApiResponse<MallStreetResponse> moveMallStreet() {
         MallStreetResponse mallStreetResponse = serviceFactory.getMallService().getMallStreetInformation();
         return ApiResponse.ok(mallStreetResponse);
     }
 
     @GetMapping("/set/destination/{mall_name}")
-    @Operation(summary = "목적지 설정", description = "목적지 설정 클릭시 상가의 너비, 위도, 경도값 제공")
+    @Operation(summary = "목적지 설정", description = "목적지 설정 클릭시 상가의 너비, 위도, 경도값 제공 API")
     public ApiResponse<MallDestinationResponse> setDestination(@PathVariable("mall_name") String mallName) {
         MallRequest mallRequest = converterFactory.getMallConverter().createRequest(mallName);
         MallDestinationResponse mallDestinationResponse = serviceFactory.getMallService().getMallDestinationInformation(mallRequest);
