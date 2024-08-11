@@ -45,6 +45,8 @@ services:
     # Available connect between container
     networks:
       - presentation-network
+    volumes:
+      - /home/ec2-user/springgreens-afe09-firebase-adminsdk-adp3n-9b5c9ffdfe.json:/app/config/firebase-adminsdk.json
 
 
   # create container for redis
