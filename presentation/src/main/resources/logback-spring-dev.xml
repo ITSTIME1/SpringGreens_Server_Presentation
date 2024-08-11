@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- RULE SETTING   -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+
+    <!-- PROPERTY SETTING  -->
+    <property name="CONSOLE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread]) %cyan([%-3level]) %logger{5} - %msg %n" />
+    <property name="ROLLING_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}  %logger{5} - %msg %n" />
+    <!--  로그파일을 저장할 상대경로 ./ -> 현재 작업 디렉토리  -->
+    <property name="LOG_DIR" value="./logs" />
+    <property name="FILE_NAME" value="${LOG_DIR}/presentation.log" />
+    <property name="LOG_NAME_PATTERN" value="${LOG_DIR}/presentation-%d{yyyy-MM-dd-HH-mm}.%i.log" />
+    <property name="MAX_FILE_SIZE" value="10MB" />
+    <property name="TOTAL_SIZE" value="30MB" />
+    <property name="MAX_HISTORY" value="10" />
+
+
+    <!-- APPENDER SETTING   -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--  파일에 로그를 남기기 위해서 RollingFileAppender 설정  -->
+    <appender name="ROLLING_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${ROLLING_PATTERN}</pattern>
+        </encoder>
+        <file>${FILE_NAME}</file>
+        <!--    rollover의 정책설정은 파일 사이즈와 시간에 기반한 정책을 사용.   -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--     파일이 저장되는 패턴을 설정 (ENV)       -->
+            <fileNamePattern>${LOG_NAME_PATTERN}</fileNamePattern>
+            <!--     저장될 수 있는 파일의 최대 수를 지정하고, 최대 파일 수를 초과하게 되면 이전 파일을 삭제      -->
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <!--     분할할 용량의 사이즈를 설정     -->
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <!--     전체파일 크기를 설정 전체 크기 제한을 초과하면 가장 오래된 로그 파일을 삭제함.    -->
+            <totalSizeCap>${TOTAL_SIZE}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!--  DEV SERVER SETTING  -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING_LOG_FILE"/>
+    </root>
+</configuration>
