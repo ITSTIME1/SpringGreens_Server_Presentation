@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://spring-greens-client.vercel.app/")  // 허용할 출처를 설정하세요
+                .allowedOrigins("https://spring-greens-client.vercel.app")  // 허용할 출처를 설정하세요
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // 허용할 HTTP 메소드 설정
                 .allowedHeaders("*")  // 허용할 헤더를 설정합니다
                 .allowCredentials(true);  // 자격 증명(쿠키 등)을 허용할지 설정
