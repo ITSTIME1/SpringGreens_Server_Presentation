@@ -47,6 +47,7 @@ services:
       - presentation-network
     volumes:
       - /home/ec2-user/springgreens-afe09-firebase-adminsdk-adp3n-9b5c9ffdfe.json:/app/config/firebase-adminsdk.json
+      - /home/ec2-user/presentation/:/app/config/
 
 
   # create container for redis
