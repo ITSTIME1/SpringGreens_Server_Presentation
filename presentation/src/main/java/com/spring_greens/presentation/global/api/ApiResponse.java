@@ -1,6 +1,7 @@
 package com.spring_greens.presentation.global.api;
 
 import com.spring_greens.presentation.global.enums.ApiMessage;
+import com.spring_greens.presentation.global.enums.JwtErrorCode;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 
@@ -59,4 +60,9 @@ public class ApiResponse<T> {
                 data);
     }
 
+    public static <T> ApiResponse<T> fail(JwtErrorCode errorCode, @Nullable final T data) {
+        return new ApiResponse<>(errorCode.getHttpStatus().value(),
+                errorCode.getMessage(),
+                data);
+    }
 }

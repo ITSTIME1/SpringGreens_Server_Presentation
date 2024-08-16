@@ -1,5 +1,6 @@
 package com.spring_greens.presentation.global.factory.service;
 
+import com.spring_greens.presentation.auth.service.UserService;
 import com.spring_greens.presentation.fcm.service.FcmService;
 import com.spring_greens.presentation.global.factory.service.ifs.ServiceFactory;
 import com.spring_greens.presentation.global.redis.service.RedisService;
@@ -28,6 +29,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
     private final MallService mallService;
     private final FcmService fcmService;
     private final ShopService shopService;
+    private final UserService userService;
     @Override
     public RedisService getRedisService() {
         return redisService;
@@ -46,5 +48,10 @@ public class ServiceFactoryImpl implements ServiceFactory {
     @Override
     public ShopService getShopService() {
         return shopService;
+    }
+
+    @Override
+    public UserService getUserService() {
+        return userService;
     }
 }
