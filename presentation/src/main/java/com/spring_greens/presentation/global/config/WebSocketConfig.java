@@ -31,7 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // setting stomp endpoint
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://spring-greens-client.vercel.app", "http://localhost:3000")
                 .withSockJS(); // support sock js
     }
 
