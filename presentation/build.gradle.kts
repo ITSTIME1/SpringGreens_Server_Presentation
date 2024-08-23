@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
 	implementation("com.google.firebase:firebase-admin:9.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive") // redis
@@ -39,7 +40,6 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-logging") // slf4j + logback
 	testImplementation("org.mockito:mockito-junit-jupiter")
-
 	implementation("org.springframework.boot:spring-boot-starter-security") // security 6.3.1
 	testImplementation("org.springframework.security:spring-security-test")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client") // Oauth2

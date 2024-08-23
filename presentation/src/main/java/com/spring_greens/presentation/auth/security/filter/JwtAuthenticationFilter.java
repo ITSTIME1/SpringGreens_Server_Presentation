@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 /**
@@ -36,11 +37,26 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
 
+    private static final String WEBSOCKET_HANDSHAKE_PATH = "/ws";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+
+//
+        // Check if the request is a WebSocket handshake
+        if (isWebSocketHandshake(request)) {
+            log.info("Pass Socket");
+            // Bypass this filter for WebSocket connections
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getAccessToken(request);
 
+        log.info("checking token : {}", token);
         try {
+            // 여기가 토큰을 받고, 검증하는 부분이 되겠네
             if(jwtProvider.validToken(token, JwtProvider.Access_TOKEN_NAME)) {
                 Authentication authentication = jwtProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,10 +69,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getAccessToken(HttpServletRequest request) {
+
+        log.info("Http get Token");
         String authorizationHeader = request.getHeader(JwtProvider.HEADER_AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith(JwtProvider.TOKEN_PREFIX)) {
             return authorizationHeader.substring(JwtProvider.TOKEN_PREFIX.length());
         }
+
         return null;
+
+    }
+
+    private boolean isWebSocketHandshake(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        // Check if the URI matches your WebSocket endpoint
+        return requestURI.startsWith("/ws");
     }
 }

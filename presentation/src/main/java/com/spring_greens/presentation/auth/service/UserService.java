@@ -93,10 +93,10 @@ public class UserService implements UserDetailsService{
                     .addressDetails(wholesaleSignupRequest.getAddressDetails())
                     .build();
             log.info("유저 저장");
-            userRepository.save(user);
-
+            User savedUser = userRepository.save(user);
+            log.info("유저 저장 완료");
             Shop shop = Shop.builder()
-                    .userId(user.getId())
+                    .userId(savedUser.getId())
                     .contact(wholesaleSignupRequest.getShopContact())
                     .name(wholesaleSignupRequest.getShopName())
                     .intro(wholesaleSignupRequest.getIntro())
@@ -105,7 +105,6 @@ public class UserService implements UserDetailsService{
                     .addressDetails(wholesaleSignupRequest.getShopAddressDetail())
                     .startTime(wholesaleSignupRequest.getStartTime())
                     .endTime(wholesaleSignupRequest.getEndTime())
-                    .registrationDateTime(wholesaleSignupRequest.getRegistrationDateTime())
                     .build();
             log.info("가게 저장");
             shopRepository.save(shop);
