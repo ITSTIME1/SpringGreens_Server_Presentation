@@ -13,6 +13,13 @@ import java.util.Optional;
 public interface ShopRepository extends CrudRepository<Shop, Long> {
 
     @Query(value = "select p.id as id, p.name as name from shop p " +
-            "where p.member_id = :memberId", nativeQuery = true)
-    Optional<FcmServiceRequestProjection> findByMemberId(@Param("memberId") Long memberId);
+            "where p.user_id = :userId", nativeQuery = true)
+    Optional<FcmServiceRequestProjection> findByMemberId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT p.mall_id FROM shop p WHERE p.user_id = :userId", nativeQuery = true)
+    Optional<Long> findMallIdByMemberId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT p.id FROM shop p WHERE p.user_id = :userId", nativeQuery = true)
+    Optional<Long> findShopIdByMemberId(@Param("userId") Long userId);
+
 }

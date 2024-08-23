@@ -1,5 +1,6 @@
 package com.spring_greens.presentation.fcm.validator.util;
 
+import com.spring_greens.presentation.global.enums.Role;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
@@ -33,7 +34,7 @@ public class FcmValidationUtils {
      * @param role
      */
     public static void validateRoleForSaveFcmToken(String role) {
-        if(role.equals("일반사용자")) {
+        if(role.equals(Role.ROLE_SOCIAL.getRoleName())) {
             throw new IllegalArgumentException("Don't have permission");
         }
     }

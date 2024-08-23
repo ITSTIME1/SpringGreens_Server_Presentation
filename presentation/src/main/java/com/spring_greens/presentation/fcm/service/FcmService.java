@@ -13,10 +13,13 @@ import com.spring_greens.presentation.fcm.entity.*;
 import com.spring_greens.presentation.fcm.exception.FcmException;
 import com.spring_greens.presentation.fcm.repository.*;
 import com.spring_greens.presentation.fcm.validator.ifs.FcmServiceValidator;
+import com.spring_greens.presentation.global.enums.Mall;
 import com.spring_greens.presentation.global.exception.CommonException;
 import com.spring_greens.presentation.global.factory.converter.ifs.ConverterFactory;
 import com.spring_greens.presentation.global.factory.service.ifs.ServiceFactory;
+import com.spring_greens.presentation.mall.repository.MallRepository;
 import com.spring_greens.presentation.shop.dto.projection.FcmServiceRequestProjection;
+import com.spring_greens.presentation.shop.repository.ShopRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -44,6 +47,8 @@ public class FcmService {
     private final FcmTopicRepository fcmTopicRepository;
     private final FcmTokenRepository fcmTokenRepository;
     private final FcmReservationMessageRepository fcmReservationMessageRepository;
+
+    private final ShopRepository shopRepository;
     private final ConverterFactory converterFactory;
     private final ServiceFactory serviceFactory;
     private final FcmServiceValidator fcmServiceValidator;
@@ -53,7 +58,7 @@ public class FcmService {
                       FcmSubscriptionRepository fcmSubscriptionRepository,
                       FcmTopicRepository fcmTopicRepository,
                       FcmTokenRepository fcmTokenRepository,
-                      FcmReservationMessageRepository fcmReservationMessageRepository,
+                      FcmReservationMessageRepository fcmReservationMessageRepository, MallRepository mallRepository, ShopRepository shopRepository,
                       ConverterFactory converterFactory,
                       @Lazy ServiceFactory serviceFactory,
                       FcmServiceValidator fcmServiceValidator, Environment environment)
@@ -63,6 +68,7 @@ public class FcmService {
         this.fcmTopicRepository = fcmTopicRepository;
         this.fcmTokenRepository = fcmTokenRepository;
         this.fcmReservationMessageRepository = fcmReservationMessageRepository;
+        this.shopRepository = shopRepository;
         this.converterFactory = converterFactory;
         this.serviceFactory = serviceFactory;
         this.fcmServiceValidator = fcmServiceValidator;
@@ -72,29 +78,46 @@ public class FcmService {
 
     @Transactional
     public boolean registerFcmService(@NotNull FcmServiceRequest fcmServiceRequest) {
-
+        // 1. Validate 'FcmRequest' for checking role and fcmToken.
         try {
             validateFcmServiceRequest(fcmServiceRequest);
         } catch (IllegalArgumentException e) {
             log.error("Error invalid argument");
             throw new FcmException.FcmIllegalArgumentException(e.getMessage());
         }
+        log.info("Success validation for FcmServiceRequest");
 
-
+        // 2. Get 'ShopDetails' from 'Shop' by using 'userId'.
         FcmServiceRequestProjection shopDetails =
-                serviceFactory.getShopService().getShopIdAndNameForFcmServiceRequestDetails(fcmServiceRequest.getMemberId());
+                serviceFactory.getShopService().getShopIdAndNameForFcmServiceRequestDetails(fcmServiceRequest.getUserId());
 
+        // 3. Get FcmToken from 'FcmToken' by using 'userId'.
+        FcmTokenProjection fcmToken = fcmTokenRepository.findByMemberId(fcmServiceRequest.getUserId())
+                .orElseThrow(() -> new CommonException.CustomNullPointerException("Couldn't find FCM token"));
+
+
+        // 3. Create and Save 'FcmRequestDetails'.
         createAndSaveFcmServiceRequest(shopDetails.getId());
 
+        log.info("Success creating ShopDetails");
+
+        // 4. Create FcmTopic.
         try {
 
-            String replaceTopicName = createFcmTopicAndSaveToFcmServer(shopDetails.getName(), fcmServiceRequest.getFcmToken());
+            // 5. Replace topicName to all lowercase and remove empty.
+            String replaceTopicName = createFcmTopicAndSaveToFcmServer(shopDetails.getName(), fcmToken.getToken());
 
+            // 6. If replaceTopicName is empty is wrong result string.
             if(replaceTopicName.isEmpty()) {
                 throw new IllegalArgumentException("TopicName is invalid argument");
             }
 
+            log.info("Success replace topic name");
+
+            // 7. Request FcmTopic to FcmServer to save specific 'fcm topic'.
             createFcmTopicAndSaveToDB(shopDetails.getId(), replaceTopicName);
+
+            log.info("Success request to fcmServer");
 
         } catch (FirebaseMessagingException e) {
 
@@ -112,7 +135,7 @@ public class FcmService {
             throw new CommonException.CustomIllegalArgumentException(e.getMessage());
 
         }
-
+        log.info("Completed.");
         return true;
     }
 
@@ -156,21 +179,25 @@ public class FcmService {
     @Transactional
     public boolean registerFcmToken(@NotNull FcmSaveTokenRequest fcmSaveTokenRequest){
 
+        // 1. Validate 'FcmSaveTokenRequest' for role, fcmToken.
         try {
             validateFcmRegisterFcmToken(fcmSaveTokenRequest);
         } catch (IllegalArgumentException e) {
             throw new FcmException.FcmIllegalArgumentException(e.getMessage());
         }
 
+        // 2. Create FcmToken.
         FcmToken fcmToken = converterFactory.getFcmConverter()
                 .createFcmToken(fcmSaveTokenRequest.getMemberId(), fcmSaveTokenRequest.getFcmToken(), fcmSaveTokenRequest.getCreatedDateTime());
 
+        // 3. Save FcmToken.
         fcmTokenRepository.save(fcmToken);
         return true;
     }
 
     @Transactional
     public boolean reserveFcmMessage(@NotNull FcmReserveRequest fcmReserveRequest) {
+        log.info("Start reserveFcmMessage");
         try {
             validateFcmReserveMessage(fcmReserveRequest);
         } catch (NullPointerException e) {
@@ -178,18 +205,75 @@ public class FcmService {
         } catch (IllegalArgumentException e) {
             throw new FcmException.FcmIllegalArgumentException(e.getMessage());
         }
+        log.info("Success validateFcmReserveMessage");
 
-        FcmTopicNameProjection fcmTopicName = fcmTopicRepository.findByShopId(fcmReserveRequest.getShopId())
+        // mallid를 가지고옴.
+        Long mallId = shopRepository.findMallIdByMemberId(fcmReserveRequest.getMemberId()).orElseThrow(()
+                -> new CommonException.CustomNullPointerException("Couldn't find mallId by using memberId"));
+        log.info("Success get mallId from db : {}", mallId);
 
-                .orElseThrow(() -> new CommonException.CustomNullPointerException("Not found fcmTopicName"));
+        // ShopId도 가지고 와서 tokenName을 가지고오자.
+        Long shopId = shopRepository.findShopIdByMemberId(fcmReserveRequest.getMemberId()).orElseThrow(()
+                -> new CommonException.CustomNullPointerException("Couldn't find mallId by using memberId"));
 
+        log.info("Success get shopId from db : {}", shopId);
 
+        FcmTopicNameProjection topicName = fcmTopicRepository.findByShopId(shopId).orElseThrow(()
+                -> new CommonException.CustomNullPointerException("Couldn't find topicName by using shopId"));
+
+        log.info("Success get topicName from db : {}", topicName.getFcmTopicName());
+
+        // tokenName도 함께 저장해야하니까
+
+        // 이미지 path를 만들어줌.
         String imageFilePath = createImageDirAndPath(fcmReserveRequest);
 
-        FcmReservationMessage fcmReserveMessage = converterFactory.getFcmConverter().createFcmReservationMessage(fcmReserveRequest, imageFilePath, fcmTopicName.getFcmTopicName());
+        log.info("Success create imageFilePath");
 
-        fcmReservationMessageRepository.save(fcmReserveMessage);
+        if(mallId == Mall.APM.getMallId()) {
+            fcmReservationMessageRepository.saveToApm(
+                    fcmReserveRequest.getMemberId(),
+                    fcmReserveRequest.getTitle(),
+                    fcmReserveRequest.getBody(),
+                    fcmReserveRequest.getReserveDateTime(),
+                    imageFilePath,
+                    topicName.getFcmTopicName());
 
+            log.info("Complete Save {}", Mall.APM.getMallName());
+
+        } else if(mallId == Mall.DONGPYEONGHWA.getMallId()) {
+            fcmReservationMessageRepository.saveToDong(
+                    fcmReserveRequest.getMemberId(),
+                    fcmReserveRequest.getTitle(),
+                    fcmReserveRequest.getBody(),
+                    fcmReserveRequest.getReserveDateTime(),
+                    imageFilePath,
+                    topicName.getFcmTopicName());
+
+            log.info("Complete Save {}", Mall.DONGPYEONGHWA.getMallName());
+
+        } else if(mallId == Mall.CHEONGPYEONGHWA.getMallId()) {
+            fcmReservationMessageRepository.saveToChung(
+                    fcmReserveRequest.getMemberId(),
+                    fcmReserveRequest.getTitle(),
+                    fcmReserveRequest.getBody(),
+                    fcmReserveRequest.getReserveDateTime(),
+                    imageFilePath,
+                    topicName.getFcmTopicName());
+
+            log.info("Complete Save {}", Mall.CHEONGPYEONGHWA.getMallName());
+
+        } else if(mallId == Mall.JEIL.getMallId()) {
+            fcmReservationMessageRepository.saveToJeil(
+                    fcmReserveRequest.getMemberId(),
+                    fcmReserveRequest.getTitle(),
+                    fcmReserveRequest.getBody(),
+                    fcmReserveRequest.getReserveDateTime(),
+                    imageFilePath,
+                    topicName.getFcmTopicName());
+
+            log.info("Complete Save {}", Mall.JEIL.getMallName());
+        }
         return true;
     }
 

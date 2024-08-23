@@ -3,12 +3,12 @@ package com.spring_greens.presentation.auth.controller;
 
 import com.spring_greens.presentation.auth.dto.request.RetailSignupRequest;
 import com.spring_greens.presentation.auth.dto.request.WholesaleSignupRequest;
-import org.springframework.stereotype.Controller;
 import com.spring_greens.presentation.global.api.ApiResponse;
 import com.spring_greens.presentation.global.controller.AbstractBaseController;
 import com.spring_greens.presentation.global.factory.converter.ifs.ConverterFactory;
 import com.spring_greens.presentation.global.factory.service.ifs.ServiceFactory;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 

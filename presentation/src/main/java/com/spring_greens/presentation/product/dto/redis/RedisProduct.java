@@ -1,5 +1,6 @@
 package com.spring_greens.presentation.product.dto.redis;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.spring_greens.presentation.product.deserializer.redis.RedisProductJsonDeserializer;
@@ -21,6 +22,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 @JsonDeserialize(using = RedisProductJsonDeserializer.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class RedisProduct<T extends ShopInformation<? extends ProductInformation>> {
     private Long mall_id;
     private String mall_name;

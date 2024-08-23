@@ -1,8 +1,11 @@
 package com.spring_greens.presentation.fcm.converter;
 
 import com.spring_greens.presentation.fcm.converter.ifs.FcmConverter;
-import com.spring_greens.presentation.fcm.dto.request.FcmReserveRequest;
-import com.spring_greens.presentation.fcm.entity.*;
+import com.spring_greens.presentation.fcm.dto.request.FcmServiceRequest;
+import com.spring_greens.presentation.fcm.entity.FcmServiceRequestDetails;
+import com.spring_greens.presentation.fcm.entity.FcmSubscription;
+import com.spring_greens.presentation.fcm.entity.FcmToken;
+import com.spring_greens.presentation.fcm.entity.FcmTopic;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -32,7 +35,7 @@ public class FcmConverterImpl implements FcmConverter {
     @Override
     public FcmToken createFcmToken(Long memberId, String fcmToken, LocalDateTime createdDateTime) {
         return FcmToken.builder()
-                .memberId(memberId)
+                .userId(memberId)
                 .token(fcmToken)
                 .createdDateTime(createdDateTime)
                 .registrationDateTime(LocalDateTime.now())
@@ -41,17 +44,22 @@ public class FcmConverterImpl implements FcmConverter {
 
     @Override
     public FcmSubscription createFcmSubscription(Long memberId, String topicName) {
-        return FcmSubscription.builder().memberId(memberId).topicName(topicName).build();
+        return FcmSubscription.builder().userId(memberId).topicName(topicName).build();
     }
 
+//    @Override
+//    public FcmReservationMessageApm createFcmReservationMessage(FcmReserveRequest fcmReserveRequest, String imagePath, String topicName) {
+//        return FcmReservationMessageApm.builder()
+//                .title(fcmReserveRequest.getTitle())
+//                .body(fcmReserveRequest.getBody())
+//                .reserveDateTime(fcmReserveRequest.getReserveDateTime())
+//                .imagePath(imagePath)
+//                .topicName(topicName)
+//                .build();
+//    }
+
     @Override
-    public FcmReservationMessage createFcmReservationMessage(FcmReserveRequest fcmReserveRequest, String imagePath, String topicName) {
-        return FcmReservationMessage.builder()
-                .title(fcmReserveRequest.getTitle())
-                .body(fcmReserveRequest.getBody())
-                .reserveDateTime(fcmReserveRequest.getReserveDateTime())
-                .imagePath(imagePath)
-                .topicName(topicName)
-                .build();
+    public FcmServiceRequest createFcmServiceRequest(Long userId, String role) {
+        return FcmServiceRequest.builder().role(role).userId(userId).build();
     }
 }

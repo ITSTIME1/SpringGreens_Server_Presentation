@@ -1,4 +1,6 @@
 package com.spring_greens.presentation.product.dto.redis.information;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.spring_greens.presentation.product.deserializer.redis.RedisProductInformationJsonDeserializer;
@@ -9,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @JsonDeserialize(using = RedisProductInformationJsonDeserializer.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ProductInformation {
     private Long product_id;
     private String product_name;

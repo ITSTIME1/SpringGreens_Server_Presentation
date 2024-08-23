@@ -55,7 +55,6 @@ public class RedisProductJsonDeserializer extends JsonDeserializer<DeserializedR
                     })
                     .toList();
 
-
             return converterFactory.getRedisConverter().convertDeserializedRedisProduct(jsonNode, deserializedRedisShopInformationList);
         } catch (IOException e) {
             log.error("Error deserializing JSON: {}", e.getMessage(), e);
