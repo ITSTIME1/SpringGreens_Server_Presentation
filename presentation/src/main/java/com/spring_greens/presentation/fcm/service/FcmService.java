@@ -186,7 +186,15 @@ public class FcmService {
             throw new FcmException.FcmIllegalArgumentException(e.getMessage());
         }
 
-        // 2. Create FcmToken.
+
+        FcmTokenProjection savedFcmToken = fcmTokenRepository.findByMemberId(fcmSaveTokenRequest.getMemberId()).orElseThrow();
+
+        if(savedFcmToken.getToken() != null && !Objects.equals(savedFcmToken.getToken(), fcmSaveTokenRequest.getFcmToken())) {
+            fcmTokenRepository.updateFcmToken(fcmSaveTokenRequest.getMemberId(), fcmSaveTokenRequest.getFcmToken());
+            return true;
+        }
+
+        // 2-2. Create FcmToken.
         FcmToken fcmToken = converterFactory.getFcmConverter()
                 .createFcmToken(fcmSaveTokenRequest.getMemberId(), fcmSaveTokenRequest.getFcmToken(), fcmSaveTokenRequest.getCreatedDateTime());
 

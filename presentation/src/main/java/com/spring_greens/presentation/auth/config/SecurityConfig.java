@@ -36,7 +36,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**", "/api/product/**", "/api/map/**", "/ws/**"};
+    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**", "/api/product/**", "/api/map/**", "/ws/**", "/images/**"};
     private final String[] PUBLIC_URLS_AUTH = {"/oauth2/authorization/**", "/login", "/*/login", "/login/**", "/*/login/**", "/signup", "/signup/**"};
 
     /* Currently, these role-based restrictions are commented out due to missing URL definitions. */
