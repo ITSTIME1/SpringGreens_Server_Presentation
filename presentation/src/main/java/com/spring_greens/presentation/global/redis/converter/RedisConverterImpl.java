@@ -5,18 +5,20 @@ import com.spring_greens.presentation.global.enums.Domain;
 import com.spring_greens.presentation.global.redis.converter.ifs.RedisConverter;
 import com.spring_greens.presentation.product.dto.redis.DeserializedRedisProduct;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductInformation;
+import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductViewCountInformation;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisShopInformation;
+import com.spring_greens.presentation.product.dto.redis.information.MainRedisProductInformation;
 import com.spring_greens.presentation.product.dto.redis.information.MapRedisProductInformation;
 import com.spring_greens.presentation.product.dto.redis.request.RedisProductRequest;
+import com.spring_greens.presentation.product.dto.redis.response.MainRedisProductResponse;
 import com.spring_greens.presentation.product.dto.redis.response.MapRedisProductResponse;
 import com.spring_greens.presentation.product.dto.redis.response.ifs.RedisProductResponse;
+import com.spring_greens.presentation.shop.dto.information.MainRedisShopInformation;
 import com.spring_greens.presentation.shop.dto.information.MapRedisShopInformation;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-
 
 @Component
 public class RedisConverterImpl implements RedisConverter {
@@ -24,6 +26,9 @@ public class RedisConverterImpl implements RedisConverter {
     public RedisProductResponse createResponse(String domain, DeserializedRedisProduct deserializedRedisProduct) {
         if(domain.equals(Domain.MAP.getDomain())) {
             return this.convertMapRedisProductResponse(deserializedRedisProduct);
+        }
+        if(domain.equals(Domain.MAIN.getDomain())) {
+            return this.convertMainRedisProductResponse(deserializedRedisProduct);
         }
         return null;
     }
@@ -33,7 +38,33 @@ public class RedisConverterImpl implements RedisConverter {
         return RedisProductRequest.builder().domain(domain).mallName(mallName).build();
     }
 
-
+    @Override
+    public MainRedisProductResponse convertMainRedisProductResponse(DeserializedRedisProduct deserializedRedisProduct) {
+        List<MainRedisShopInformation> mainRedisShopInformationList =
+                deserializedRedisProduct.getShop_list().stream().map(shopInfo ->
+                        MainRedisShopInformation.builder()
+                                .shop_id(shopInfo.getShop_id())
+                                .shop_name(shopInfo.getShop_name())
+                                .shop_contact(shopInfo.getShop_contact())
+                                .shop_address_details(shopInfo.getShop_address_details())
+                                .product(shopInfo.getProduct().stream().map(productInfo ->
+                                                MainRedisProductInformation.builder()
+                                                        .product_id(productInfo.getProduct_id())
+                                                        .product_name(productInfo.getProduct_name())
+                                                        .product_unit(productInfo.getProduct_unit())
+                                                        .product_price(productInfo.getProduct_price())
+                                                        .product_view_count(productInfo.getProduct_view_count())
+                                                        .product_image_url(productInfo.getProduct_image_url())
+                                                        .major_category(productInfo.getMajor_category())
+                                                        .sub_category(productInfo.getSub_category())
+                                                        .build())
+                                        .collect(Collectors.toList()))
+                                .build()).collect(Collectors.toList());
+        return MainRedisProductResponse.builder()
+                .mall_id(deserializedRedisProduct.getMall_id())
+                .mall_name(deserializedRedisProduct.getMall_name())
+                .shop_list(mainRedisShopInformationList).build();
+    }
 
     @Override
     public MapRedisProductResponse convertMapRedisProductResponse(DeserializedRedisProduct deserializedRedisProduct) {
@@ -93,5 +124,13 @@ public class RedisConverterImpl implements RedisConverter {
                 .build();
     }
 
-
+    @Override
+    public DeserializedRedisProductViewCountInformation convertDeserializedProductViewCountInformation(JsonNode jsonNode) {
+        return DeserializedRedisProductViewCountInformation
+                .builder()
+                .mall_name(jsonNode.get("mall_name").asText())
+                .product_id(jsonNode.get("product_id").asLong())
+                .view_count(jsonNode.get("view_count").asInt())
+                .build();
+    }
 }

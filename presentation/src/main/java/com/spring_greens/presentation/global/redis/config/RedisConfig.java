@@ -1,4 +1,6 @@
 package com.spring_greens.presentation.global.redis.config;
+import com.spring_greens.presentation.global.redis.stream.RedisPublisher;
+import com.spring_greens.presentation.global.redis.stream.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -6,9 +8,15 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Configuration
@@ -78,5 +86,28 @@ public class RedisConfig {
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new GenericToStringSerializer<>(Long.class));
         return template;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, RedisSubscriber redisSubscriber) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(redisSubscriber, registerTopic());
+        return container;
+    }
+
+    @Bean
+    public RedisPublisher redisPublisher(StringRedisTemplate redisTemplate) {
+        return new RedisPublisher(redisTemplate);
+    }
+
+    @Bean
+    public List<Topic> registerTopic() {
+        List<Topic> topics = new ArrayList<>();
+        topics.add(new ChannelTopic("/apm"));
+        topics.add(new ChannelTopic("/chung"));
+        topics.add(new ChannelTopic("/dong"));
+        topics.add(new ChannelTopic("/jeil"));
+        return topics;
     }
 }

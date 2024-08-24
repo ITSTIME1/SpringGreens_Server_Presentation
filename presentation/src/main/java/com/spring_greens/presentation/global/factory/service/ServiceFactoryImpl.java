@@ -30,6 +30,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
     private final FcmService fcmService;
     private final ShopService shopService;
     private final UserService userService;
+
     @Override
     public RedisService getRedisService() {
         return redisService;

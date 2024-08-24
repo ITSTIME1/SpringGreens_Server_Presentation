@@ -29,12 +29,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**"};
+    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/error", "/exception/**", "/ws/**"};
     private final String[] PUBLIC_URLS_AUTH = {"/oauth2/authorization/**", "/login", "/*/login", "/login/**", "/*/login/**", "/signup", "/signup/**"};
+    private final String[] PUBLIC_URLS_MAIN = {"/api/main/set/scheduledProduct", "/api/main/get/scheduledProduct/*", "/api/main/set/scheduledProduct/incrementViewCount/**"};
 
     /* Currently, these role-based restrictions are commented out due to missing URL definitions. */
 //    private final String[] AUTHORIZED_URLS_SOCIAL = {};
@@ -110,12 +116,28 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(PUBLIC_URLS_GLOBAL).permitAll()
                                 .requestMatchers(PUBLIC_URLS_AUTH).permitAll()
+                                .requestMatchers(PUBLIC_URLS_MAIN).permitAll()
 //                        .requestMatchers(AUTHORIZED_URLS_SOCIAL).hasRole("SOCIAL") // AUTHORIZED Social
 //                        .requestMatchers(AUTHORIZED_URLS_RETAILER).hasRole("RETAILER") // AUTHORIZED Restailer
 //                        .requestMatchers(AUTHORIZED_URLS_WHOLESALER).hasRole("WHOLESALER") // AUTHORIZED Wholsesaler
                                 .anyRequest().authenticated()
                 )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
                 .build();
+    }
+
+    /* 추후 corsFIlter로 따로 만들어서 추가해줘야될 것 같다. Oauth */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://spring-greens-client.vercel.app"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
