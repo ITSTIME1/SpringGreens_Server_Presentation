@@ -95,6 +95,7 @@ public class RedisService {
         /* DeserializedRedisProduct -> ScheduledRedisProduct */
         String mall_name = deserializedRedisProduct.getMall_name();
         try {
+            // 여기서 상품을 저장하고 ttl을 설정하자.
             redisRepository.saveProductsByMallName(mall_name, deserializedRedisProduct);
             return true;
         } catch (NullPointerException e) {
@@ -180,5 +181,10 @@ public class RedisService {
             log.error("IllegalArgumentException : {}", e.getMessage(), e);
             throw new RedisException.RedisIllegalArgumentException(e.getMessage());
         }
+     }
+
+     public Long getRemainingTime(String mallName){
+        Long remainingTime = redisRepository.getMallRemainingTime(mallName);
+        return remainingTime;
      }
 }

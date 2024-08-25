@@ -1,4 +1,5 @@
 package com.spring_greens.presentation.global.redis.config;
+
 import com.spring_greens.presentation.global.redis.stream.RedisPublisher;
 import com.spring_greens.presentation.global.redis.stream.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,12 +35,6 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.password}")
     private String password;
-
-    private final SimpMessagingTemplate simpMessagingTemplate;
-
-    public RedisConfig(SimpMessagingTemplate simpMessagingTemplate) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
-    }
 
 
     /**

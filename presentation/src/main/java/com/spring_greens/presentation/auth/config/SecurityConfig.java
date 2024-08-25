@@ -38,9 +38,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**", "/api/product/**", "/api/map/**", "/ws/**", "/images/**"};
+    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**", "/api/product/**", "/api/map/**", "/ws/**", "/images/**", "/api/main/**"};
     private final String[] PUBLIC_URLS_AUTH = {"/oauth2/authorization/**", "/login", "/*/login", "/login/**", "/*/login/**", "/signup", "/signup/**"};
-    private final String[] PUBLIC_URLS_MAIN = {"/api/main/set/scheduledProduct", "/api/main/get/scheduledProduct/*", "/api/main/set/scheduledProduct/incrementViewCount/**"};
+    private final String[] PUBLIC_URLS_MAIN = {"/api/main/set/scheduledProduct", "/api/main/get/scheduledProduct/**", "/api/main/set/scheduledProduct/incrementViewCount/**"};
 
     /* Currently, these role-based restrictions are commented out due to missing URL definitions. */
 //    private final String[] AUTHORIZED_URLS_SOCIAL = {};
@@ -132,27 +132,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://spring-greens-client.vercel.app"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://spring-greens-client.vercel.app", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // 허용할 출처
-        configuration.addAllowedOrigin("https://spring-greens-client.vercel.app"); // 다른 허용 출처
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
-        configuration.addAllowedHeader("*"); // 모든 헤더 허용
-        configuration.setAllowCredentials(true); // 자격 증명 허용 (쿠키 등)
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
     }
 

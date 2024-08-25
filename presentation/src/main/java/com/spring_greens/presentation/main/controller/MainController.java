@@ -17,8 +17,16 @@ public class MainController extends AbstractBaseController {
         super(converterFactory, serviceFactory);
     }
 
-    @PostMapping("/set/scheduledProduct")
-    public ApiResponse<?> setScheduleProducts(@RequestBody DeserializedRedisProduct deserializedRedisProduct) {
+    /**
+     * Scheduling server will send redisProduct this class by using webClient.
+     * if then, saveScheduledProducts will save products into redis.
+     * @param deserializedRedisProduct
+     * @return
+     */
+
+    @PostMapping("/set/scheduled_product")
+    public ApiResponse<?> saveScheduledProducts(@RequestBody DeserializedRedisProduct deserializedRedisProduct) {
+        log.info("SaveScheduledProduct processing");
         boolean result = serviceFactory.getRedisService().setScheduledRedisProduct(deserializedRedisProduct);
         if(!result) {
             return ApiResponse.fail();
@@ -42,5 +50,18 @@ public class MainController extends AbstractBaseController {
             return ApiResponse.fail();
         }
         return ApiResponse.ok();
+    }
+
+    /**
+     * Get remaining Time of Saved redisProducts that specific mall
+     * @param mallName
+     * @return
+     */
+
+    @GetMapping("/get/remaining_time/{mall_name}")
+    public ApiResponse<?> getRemainingTimeOfScheduledRedisProduct(@PathVariable("mall_name") String mallName){
+        Long result = serviceFactory.getRedisService().getRemainingTime(mallName);
+        log.info("{} : {}", result / 60, result % 60);
+        return ApiResponse.ok(result);
     }
 }

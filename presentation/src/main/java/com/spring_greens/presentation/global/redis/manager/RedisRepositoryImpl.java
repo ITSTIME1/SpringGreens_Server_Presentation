@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TemplateManager contains RedisTemplate for Json, Hash. <br>
@@ -44,7 +45,8 @@ public class RedisRepositoryImpl implements RedisRepository {
             throw new NullPointerException();
         }
         ValueOperations<String, Object> valueOps = redisJsonTemplate.opsForValue();
-        valueOps.set(mallName, serializedRedisProduct);
+        valueOps.set(mallName, serializedRedisProduct, 300, TimeUnit.SECONDS); // 초 단위로 저장. 이후, 클라이언트에서는 초를 변환하는 작업만 하면됨.
+
     }
 
     public Map<String, Long> getAllProductViewCount(final String redisViewKey) {
@@ -56,5 +58,10 @@ public class RedisRepositoryImpl implements RedisRepository {
     public Integer incrementProductViewCount (final String redisViewKey, final long productId) {
         HashOperations<String, String, Integer> hashOps = redisHashTemplate.opsForHash();
         return hashOps.increment(redisViewKey, Long.toString(productId), 1).intValue();
+    }
+
+    @Override
+    public Long getMallRemainingTime(String mallName) {
+        return redisJsonTemplate.getExpire(mallName, TimeUnit.SECONDS);
     }
 }

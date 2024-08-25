@@ -12,4 +12,6 @@ public interface RedisRepository {
     Integer incrementProductViewCount (final String redisViewKey, final long productId);
 
     Map<String, Long> getAllProductViewCount(final String redisViewKey);
+
+    Long getMallRemainingTime(final String mallName);
 }
