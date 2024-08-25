@@ -7,8 +7,11 @@ import com.spring_greens.presentation.product.dto.redis.RedisProduct;
 import com.spring_greens.presentation.global.redis.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
+import java.util.Map;
 
 /**
  * TemplateManager contains RedisTemplate for Json, Hash. <br>
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Repository;
 public class RedisRepositoryImpl implements RedisRepository {
 
     private final RedisTemplate<String, Object> redisJsonTemplate;
+    private final RedisTemplate<String, Long> redisHashTemplate;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -30,6 +34,27 @@ public class RedisRepositoryImpl implements RedisRepository {
         if(serializedProducts == null) {
             throw new NullPointerException();
         }
+
         return (DeserializedRedisProduct) objectMapper.readValue(serializedProducts.toString(), RedisProduct.class);
+    }
+
+    public void saveProductsByMallName(final String mallName, final DeserializedRedisProduct deserializedRedisProduct) throws JsonProcessingException {
+        final Object serializedRedisProduct =  objectMapper.writeValueAsString(deserializedRedisProduct);
+        if(serializedRedisProduct == null) {
+            throw new NullPointerException();
+        }
+        ValueOperations<String, Object> valueOps = redisJsonTemplate.opsForValue();
+        valueOps.set(mallName, serializedRedisProduct);
+    }
+
+    public Map<String, Long> getAllProductViewCount(final String redisViewKey) {
+        HashOperations<String, String, Long> hashOps = redisHashTemplate.opsForHash();
+
+        return hashOps.entries(redisViewKey);
+    }
+
+    public Integer incrementProductViewCount (final String redisViewKey, final long productId) {
+        HashOperations<String, String, Integer> hashOps = redisHashTemplate.opsForHash();
+        return hashOps.increment(redisViewKey, Long.toString(productId), 1).intValue();
     }
 }

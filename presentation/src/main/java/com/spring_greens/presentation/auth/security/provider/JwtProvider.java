@@ -123,7 +123,6 @@ public class JwtProvider {
      * </p>
      */
     public boolean validToken(String token, String tokenType) {
-        // java.lang.IllegalArgumentException: CharSequence cannot be null or empty.
         if (token == null || token.trim().isEmpty()) {
             log.error("JwtToken is invalid because token is null or token is empty string : {}",JwtErrorCode.UNKNOWN_TOKEN.getMessage());
             throw new JwtException.JwtNotValidateException(JwtErrorCode.UNKNOWN_TOKEN);
