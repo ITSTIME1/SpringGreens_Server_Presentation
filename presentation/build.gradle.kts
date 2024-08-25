@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-websocket") // webSocket
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
 	implementation("com.google.firebase:firebase-admin:9.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive") // redis

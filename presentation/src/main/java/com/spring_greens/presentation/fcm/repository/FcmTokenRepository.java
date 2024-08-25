@@ -11,6 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface FcmTokenRepository extends CrudRepository<FcmToken, Long> {
-    @Query(value = "select token from fcm_token where member_id = :memberId", nativeQuery = true)
-    Optional<FcmTokenProjection> findByMemberId(@Param("memberId") Long memberId);
+    @Query(value = "select token from fcm_token where user_id = :userId", nativeQuery = true)
+    Optional<FcmTokenProjection> findByMemberId(@Param("userId") Long userId);
+
+    @Query(value = "update fcm_token set token=:newToken where user_id=:userId", nativeQuery = true)
+    void updateFcmToken(@Param("userId") Long userId, @Param("newToken")String newToken);
 }

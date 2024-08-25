@@ -18,8 +18,8 @@ public class FcmToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Description("기기 고유값 fcm token")
     private String token;

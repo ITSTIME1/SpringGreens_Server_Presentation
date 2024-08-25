@@ -15,8 +15,8 @@ public class FcmSubscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "topic_name")
     private String topicName;

@@ -3,11 +3,11 @@ package com.spring_greens.presentation.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring_greens.presentation.auth.security.filter.CustomLogoutFilter;
 import com.spring_greens.presentation.auth.security.filter.JsonAuthenticationFilter;
+import com.spring_greens.presentation.auth.security.filter.JwtAuthenticationFilter;
 import com.spring_greens.presentation.auth.security.handler.CustomFailureHandler;
 import com.spring_greens.presentation.auth.security.handler.CustomSuccessHandler;
 import com.spring_greens.presentation.auth.security.handler.JwtAccessDeniedHandler;
 import com.spring_greens.presentation.auth.security.handler.JwtAuthenticationEntryPoint;
-import com.spring_greens.presentation.auth.security.filter.JwtAuthenticationFilter;
 import com.spring_greens.presentation.auth.security.provider.JwtProvider;
 import com.spring_greens.presentation.auth.service.OAuth2Service;
 import com.spring_greens.presentation.auth.service.UserService;
@@ -32,13 +32,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
+
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/error", "/exception/**", "/ws/**"};
+    private final String[] PUBLIC_URLS_GLOBAL = {"/", "/main", "/error", "/exception/**", "/api/product/**", "/api/map/**", "/ws/**", "/images/**"};
     private final String[] PUBLIC_URLS_AUTH = {"/oauth2/authorization/**", "/login", "/*/login", "/login/**", "/*/login/**", "/signup", "/signup/**"};
     private final String[] PUBLIC_URLS_MAIN = {"/api/main/set/scheduledProduct", "/api/main/get/scheduledProduct/*", "/api/main/set/scheduledProduct/incrementViewCount/**"};
 
@@ -95,6 +95,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -114,6 +115,7 @@ public class SecurityConfig {
                                 .accessDeniedHandler(jwtAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
+
                                 .requestMatchers(PUBLIC_URLS_GLOBAL).permitAll()
                                 .requestMatchers(PUBLIC_URLS_AUTH).permitAll()
                                 .requestMatchers(PUBLIC_URLS_MAIN).permitAll()
@@ -137,6 +139,20 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:3000"); // 허용할 출처
+        configuration.addAllowedOrigin("https://spring-greens-client.vercel.app"); // 다른 허용 출처
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        configuration.addAllowedHeader("*"); // 모든 헤더 허용
+        configuration.setAllowCredentials(true); // 자격 증명 허용 (쿠키 등)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
     }
 

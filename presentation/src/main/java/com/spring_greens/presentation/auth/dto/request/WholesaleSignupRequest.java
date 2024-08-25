@@ -2,7 +2,7 @@ package com.spring_greens.presentation.auth.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import java.time.LocalDateTime;
+
 import java.time.LocalTime;
 
 @Getter
@@ -23,5 +23,4 @@ public class WholesaleSignupRequest {
     private boolean profileType;
     private LocalTime startTime;
     private LocalTime endTime;
-    private LocalDateTime registrationDateTime;
 }

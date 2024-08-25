@@ -2,6 +2,7 @@ package com.spring_greens.presentation.global.redis.converter.ifs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.spring_greens.presentation.product.dto.redis.DeserializedRedisProduct;
+import com.spring_greens.presentation.product.dto.redis.ScheduledRedisProduct;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductInformation;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisProductViewCountInformation;
 import com.spring_greens.presentation.product.dto.redis.deserialized.DeserializedRedisShopInformation;

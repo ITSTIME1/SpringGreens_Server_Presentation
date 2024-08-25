@@ -15,6 +15,7 @@ import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,13 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.password}")
     private String password;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public RedisConfig(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
+
 
     /**
      * This method will set redisConfiguration between synchronous and asynchronous. <br>
@@ -75,6 +83,7 @@ public class RedisConfig {
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.afterPropertiesSet();
         return template;
     }
 
@@ -100,6 +109,7 @@ public class RedisConfig {
     public RedisPublisher redisPublisher(StringRedisTemplate redisTemplate) {
         return new RedisPublisher(redisTemplate);
     }
+
 
     @Bean
     public List<Topic> registerTopic() {

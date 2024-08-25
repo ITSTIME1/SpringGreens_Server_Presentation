@@ -124,6 +124,7 @@ public class JwtProvider {
      */
     public boolean validToken(String token, String tokenType) {
         if (token == null || token.trim().isEmpty()) {
+            log.error("JwtToken is invalid because token is null or token is empty string : {}",JwtErrorCode.UNKNOWN_TOKEN.getMessage());
             throw new JwtException.JwtNotValidateException(JwtErrorCode.UNKNOWN_TOKEN);
         }
 
@@ -133,6 +134,8 @@ public class JwtProvider {
                     .build()
                     .parseSignedClaims(token).getPayload();
 
+
+            // 토큰의 타입이 액세스토큰인지 판별
             if(tokenType.equals(Access_TOKEN_NAME)) {
                 if (!claims.get("token_type").equals(tokenType)) {
                     log.info(JwtErrorCode.INVALID_TYPE_TOKEN.getMessage());
@@ -140,7 +143,11 @@ public class JwtProvider {
                 }
             }
 
+            /**
+             * If take token from claims has expired, before is true.
+             */
             if (claims.getExpiration().before(new Date())) {
+                // 만료가 되었다는 로그기록이고, 에러를 던져주네
                 log.info(JwtErrorCode.EXPIRED_TOKEN.getMessage());
                 throw new JwtException.JwtNotValidateException(JwtErrorCode.EXPIRED_TOKEN);
             }

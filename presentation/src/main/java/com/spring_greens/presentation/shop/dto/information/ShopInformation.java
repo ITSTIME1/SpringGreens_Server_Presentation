@@ -1,5 +1,6 @@
 package com.spring_greens.presentation.shop.dto.information;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.spring_greens.presentation.product.deserializer.redis.RedisShopInformationJsonDeserializer;
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @JsonDeserialize(using = RedisShopInformationJsonDeserializer.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ShopInformation<T extends ProductInformation> {
     private Long shop_id;
     private String shop_name;
